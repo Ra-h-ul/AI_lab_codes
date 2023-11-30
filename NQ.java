@@ -1,65 +1,69 @@
-import java.util.Arrays;
-
-public class NQ{
+public class NQ {
     public static void main(String[] args) {
-        char[][] mat = new char[4][4];
-        mat[0][1] = 'q';
-        BacktrackingOptimized b = new BacktrackingOptimized(mat);
-        boolean ans = b.backtrack(1);
-        System.out.println(Arrays.deepToString(mat));
-        System.out.println(ans);
-    }
-}
-
-class BacktrackingOptimized {
-    char[][] matrix;
-    private int n;
-
-    BacktrackingOptimized(char[][] m) {
-        matrix = m;
-        n = matrix.length;
+        int n = 4;
+        boolean[][] board = new boolean[n][n];
+        System.out.println(queens(board, 0));
     }
 
-    public boolean backtrack(int r) {
-        if (r == n)
-            return true;
-        for (int i = 0; i < n; i++) {
-            if (!isAttack(r, i)) {
-                matrix[r][i] = 'q';
-                if (backtrack(r + 1)) {
-                    return true;
-                }
-                matrix[r][i] = '\0';
+    static int queens(boolean[][] board, int row) {
+        if (row == board.length) {
+            display(board);
+            System.out.println();
+            return 1;
+        }
+
+        int count = 0;
+
+        // placing the queen and checking for every row and col
+        for (int col = 0; col < board.length; col++) {
+            // place the queen if it is safe
+            if(isSafe(board, row, col)) {
+                board[row][col] = true;
+                count += queens(board, row + 1);
+                board[row][col] = false;
             }
         }
-        return false;
+
+        return count;
     }
 
-    private boolean isAttack(int r, int c) {
-        for (int i = 0; i < n; i++) {
-            if (matrix[r][i] == 'q')
-                return true;
+    private static boolean isSafe(boolean[][] board, int row, int col) {
+        // check vertical row
+        for (int i = 0; i < row; i++) {
+            if (board[i][col]) {
+                return false;
+            }
         }
-        for (int i = 0; i < n; i++) {
-            if (matrix[i][c] == 'q')
-                return true;
+
+        // diagonal left
+        int maxLeft = Math.min(row, col);
+        for (int i = 1; i <= maxLeft; i++) {
+            if(board[row-i][col-i]) {
+                return false;
+            }
         }
-        for (int i = r - 1, j = c - 1; i >= 0 && j >= 0; i--, j--) {
-            if (matrix[i][j] == 'q')
-                return true;
+
+        // diagonal right
+        int maxRight = Math.min(row, board.length - col - 1);
+        for (int i = 1; i <= maxRight; i++) {
+            if(board[row-i][col+i]) {
+                return false;
+            }
         }
-        for (int i = r + 1, j = c + 1; i < n && j < n; i++, j++) {
-            if (matrix[i][j] == 'q')
-                return true;
+
+        return true;
+    }
+
+    private static void display(boolean[][] board) {
+        for(boolean[] row : board) {
+            for(boolean element : row) {
+                if (element) {
+                    System.out.print("Q ");
+                } else {
+                    System.out.print("X ");
+                }
+            }
+            System.out.println();
         }
-        for (int i = r - 1, j = c + 1; i >= 0 && j < n; i--, j++) {
-            if (matrix[i][j] == 'q')
-                return true;
-        }
-        for (int i = r + 1, j = c - 1; i < n && j >= 0; j--, i++) {
-            if (matrix[i][j] == 'q')
-                return true;
-        }
-        return false;
     }
 }
